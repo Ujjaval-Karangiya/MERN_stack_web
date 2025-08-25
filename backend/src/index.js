@@ -25,6 +25,7 @@ app.use(cookieParser());
 app.use("/api/auth", authRouter);
 app.use("/api/message", messageRouter);
 
+// ------------------ Start Server ------------------
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
   connectDB();

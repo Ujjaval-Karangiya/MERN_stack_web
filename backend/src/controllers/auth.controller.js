@@ -95,38 +95,93 @@ export const logout = (req, res) => {
 };
 
 // ------------------ Update Profile ------------------
+
+// export const updateProfile = async (req, res) => {
+//   try {
+//     const { name, password, profilePic } = req.body;
+//     const userId = req.user._id;
+    
+//     const user = await User.findById(userId);
+//     if (!user) return res.status(404).json({ message: "User not found" });
+    
+//     // Update name
+//     if (name) user.name = name;
+    
+//     // Handle Base64 image
+//     console.log("Incoming profilePic length:", profilePic?.length);
+//     if (profilePic) {
+//       // Strip prefix if exists (e.g. "data:image/png;base64,...")
+//       const base64Data = profilePic.startsWith("data:")
+//         ? profilePic.split(",")[1]
+//         : profilePic;
+
+//       const uploadResponse = await cloudinary.uploader.upload(
+//         `data:image/png;base64,${base64Data}`, // always valid format
+//         { folder: "profiles" }
+//       );
+
+//       user.profilepic = uploadResponse.secure_url;
+//     }
+
+//     // Handle password
+//     if (password) {
+//       if (password.length < 6) {
+//         return res
+//           .status(400)
+//           .json({ message: "Password must be at least 6 characters long" });
+//       }
+//       const salt = await bcrypt.genSalt(10);
+//       user.password = await bcrypt.hash(password, salt);
+//     }
+
+//     const updatedUser = await user.save();
+
+//     res.status(200).json({
+//       message: "Profile updated successfully",
+//       user: {
+//         _id: updatedUser._id,
+//         name: updatedUser.name,
+//         email: updatedUser.email,
+//         profilePic: updatedUser.profilepic || null,
+//       },
+//     });
+//   } catch (error) {
+//     console.error("Error in updateProfile:", error);
+//     res.status(500).json({ message: "Profile upload failed", error: error.message });
+//   }
+// };
+
+
 export const updateProfile = async (req, res) => {
   try {
-    const { profilePic } = req.body;
     const userId = req.user._id;
+    const { name, profilePic, password } = req.body;
 
-    if (!profilePic) {
-      return res.status(400).json({ message: "Please provide a profile picture" });
+    const updateFields = {};
+
+    if (name) updateFields.fullName = name;
+    if (profilePic) updateFields.profilePic = profilePic;
+    if (password) {
+      if (password.length < 6) {
+        return res.status(400).json({ message: "Password must be at least 6 characters long" });
+      }
+      const salt = await bcrypt.genSalt(10);
+      updateFields.password = await bcrypt.hash(password, salt);
     }
 
-    // Upload to Cloudinary
-    const uploadResponse = await cloudinary.uploader.upload(profilePic);
-
-    // Update user
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { profilepic: uploadResponse.secure_url },
+      { $set: updateFields },
       { new: true }
     ).select("-password");
 
-    if (!updatedUser) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    res.status(200).json({
-      message: "Profile picture updated successfully",
-      user: updatedUser,
-    });
-  } catch (error) {
-    console.error("Error in updateProfile controller:", error.message);
-    res.status(500).json({ message: "Internal server error" });
+    res.json(updatedUser);
+  } catch (err) {
+    console.error("Error updating profile:", err.message);
+    res.status(500).json({ message: "Server error updating profile" });
   }
 };
+
 
 // ------------------ Check Auth ------------------
 export const checkAuth = (req, res) => {

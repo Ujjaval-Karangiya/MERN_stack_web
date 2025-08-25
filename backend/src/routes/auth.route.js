@@ -17,3 +17,4 @@ router.get("/checkauth", protectRoute, checkAuth);
 
 
 export default router;
+

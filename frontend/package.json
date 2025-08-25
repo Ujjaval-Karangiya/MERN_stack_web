@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "frontend": " npm run dev",
+    "backend": " cd ../backend && npm run dev",
+    "both": "concurrently  \"npm run backend\" \"npm run frontend\""
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.12",
@@ -15,6 +18,7 @@
     "axios": "^1.11.0",
     "cors": "^2.8.5",
     "lucide-react": "^0.540.0",
+    "nodemon": "^3.1.10",
     "npx": "^3.0.0",
     "postcss": "^8.5.6",
     "react": "^19.1.1",
@@ -30,6 +34,7 @@
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react": "^4.7.0",
+    "concurrently": "^9.2.0",
     "daisyui": "^5.0.50",
     "eslint": "^9.32.0",
     "eslint-plugin-react-hooks": "^5.2.0",
