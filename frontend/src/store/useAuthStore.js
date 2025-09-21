@@ -1,5 +1,4 @@
 import { create } from "zustand";
-// import  axiosInstance  from "../lib/axios.js";
 import { axiosInstance } from "../lib/axios.js";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
@@ -15,81 +14,24 @@ export const useAuthStore = create((set, get) => ({
   onlineUsers: [],
   socket: null,
 
-//   checkAuth: async () => {
-//   set({ isCheckingAuth: true });
-//   try {
-//     const res = await axiosInstance.get("/auth/check");
-//     const user = res.data?.user || res.data; // adjust depending on backend response
-//     if (user) {
-//       set({ authUser: user });
-//       if (!get().isSocketConnected) {
-//         get().connectSocket();
-//       }
-//     } else {
-//       set({ authUser: null });
-//     }
-//   } catch (error) {
-//     console.error("Error in checkAuth:", error);
-//     set({
-//       authUser: null,
-//       authError: error.response?.data?.message || "Authentication failed",
-//     });
-//   } finally {
-//     set({ isCheckingAuth: false });
-//   }
-// },
+  checkAuth: async () => {
+    try {
+      const res = await axiosInstance.get("/auth/check");
 
-
-  // signup: async (data) => {
-  //   set({ isSigningUp: true });
-  //   try {
-  //     const res = await axiosInstance.post("/auth/signup", data);
-  //     set({ authUser: res.data });
-  //     toast.success("Account created successfully");
-  //     get().connectSocket();
-  //   } catch (error) {
-  //     toast.error(error.response.data.message);
-  //   } finally {
-  //     set({ isSigningUp: false });
-  //   }
-  // },
-checkAuth: async () => {
-  set({ isCheckingAuth: true, authError: null });
-
-  try {
-    const res = await axiosInstance.get("/auth/check");
-
-    // 🔑 Adjust depending on your backend response
-    const user = res.data?.user || res.data;
-
-    if (user) {
-      set({ authUser: user });
-
-      // ✅ Connect socket only if not already connected
-      if (!get().isSocketConnected) {
-        get().connectSocket();
-      }
-    } else {
+      set({ authUser: res.data });
+      get().connectSocket();
+    } catch (error) {
+      console.log("Error in checkAuth:", error);
       set({ authUser: null });
+    } finally {
+      set({ isCheckingAuth: false });
     }
-  } catch (error) {
-    console.error("❌ Error in checkAuth:", error);
-
-    set({
-      authUser: null,
-      authError:
-        error.response?.data?.message || "Authentication check failed",
-    });
-  } finally {
-    set({ isCheckingAuth: false });
-  }
-},
+  },
 
   signup: async (data) => {
     set({ isSigningUp: true });
     try {
       const res = await axiosInstance.post("/auth/signup", data);
-      console.log(res); // Add this line to inspect the response
       set({ authUser: res.data });
       toast.success("Account created successfully");
       get().connectSocket();
@@ -129,7 +71,7 @@ checkAuth: async () => {
   updateProfile: async (data) => {
     set({ isUpdatingProfile: true });
     try {
-      const res = await axiosInstance.put("/auth/updateprofile", data);
+      const res = await axiosInstance.put("/auth/update-profile", data);
       set({ authUser: res.data });
       toast.success("Profile updated successfully");
     } catch (error) {
